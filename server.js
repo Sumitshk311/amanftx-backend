@@ -3,74 +3,71 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 
-// Routes imports
+// Routes
 import projectRoutes from "./routes/projectRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 
 dotenv.config();
-
-// Connect to MongoDB
 connectDB();
 
 const app = express();
 
-// 1. ADVANCED CORS SETUP
-// Isse local development aur Netlify live dono chalenge
+// ✅ CORS CONFIG (Render + Local + Netlify safe)
 const allowedOrigins = [
-  "http://localhost:5173",          // Vite Local
-  "http://localhost:3000",          // React Local
-  "https://aman-ftx.netlify.app/",    // Aapki Live Netlify Site
-  "https://aman-ftx.netlify.app"     // Check spelling (just in case)
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://aman-ftx.netlify.app"
 ];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    // allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) !== -1) {
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true); // Postman / server requests
+
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error("CORS Policy: This origin is not allowed!"));
+      console.log("❌ Blocked by CORS:", origin);
+      callback(null, true); // IMPORTANT: Don't crash server
     }
   },
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true
 }));
 
-// 2. MIDDLEWARES
-app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // Files/Form data ke liye zaruri hai
+// ✅ Preflight fix
+app.options("*", cors());
 
-// 3. ROUTES
+// Middlewares
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Routes
 app.use("/api/projects", projectRoutes);
 app.use("/api/categories", categoryRoutes);
 
-// 4. HEALTH CHECK / ROOT ROUTE
+// Root test route
 app.get("/", (req, res) => {
-  res.json({ 
-    status: "Active", 
-    message: "AmanFTX Backend is running smoothly 🚀",
-    uptime: process.uptime() 
+  res.json({
+    status: "Active",
+    message: "AmanFTX Backend Running 🚀",
+    uptime: process.uptime()
   });
 });
 
-// 5. GLOBAL ERROR HANDLER (Backend crash hone se bachata hai)
+// Global Error Handler
 app.use((err, req, res, next) => {
-  console.error("Internal Error:", err.stack);
-  res.status(500).json({ 
-    success: false, 
-    message: "Server mein kuch fatt gaya!", 
-    error: err.message 
+  console.error("🔥 SERVER ERROR:", err.stack);
+  res.status(500).json({
+    success: false,
+    message: "Backend Error",
+    error: err.message
   });
 });
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`
-  ################################################
-  🚀  Server is screaming on port: ${PORT}
-  🌍  CORS allowed for: ${allowedOrigins.join(", ")}
-  ################################################
-  `);
+  console.log("==================================");
+  console.log(`🚀 Server Running on Port ${PORT}`);
+  console.log("🌍 Allowed Origins:", allowedOrigins);
+  console.log("==================================");
 });
