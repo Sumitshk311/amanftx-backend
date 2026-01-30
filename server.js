@@ -24,7 +24,7 @@ app.use(cors({
     if (allowedOrigins.includes(origin)) return callback(null, true);
 
     console.log("❌ Blocked by CORS:", origin);
-    return callback(null, true); // prevent crash
+    return callback(null, true);
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true
@@ -61,8 +61,5 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log("==================================");
   console.log(`🚀 Server Running on Port ${PORT}`);
-  console.log("🌍 Allowed Origins:", allowedOrigins);
-  console.log("==================================");
 });

@@ -3,7 +3,6 @@ import Category from "../models/Category.js";
 
 const router = express.Router();
 
-// GET ALL CATEGORIES
 router.get("/", async (req, res) => {
   try {
     const categories = await Category.find().sort({ createdAt: -1 });
@@ -14,7 +13,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ADD CATEGORY
 router.post("/", async (req, res) => {
   try {
     const { name, displayTitle } = req.body;
@@ -36,7 +34,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-// DELETE CATEGORY
 router.delete("/:id", async (req, res) => {
   try {
     const deleted = await Category.findByIdAndDelete(req.params.id);
