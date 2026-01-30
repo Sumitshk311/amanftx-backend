@@ -3,7 +3,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 
-// Routes
 import projectRoutes from "./routes/projectRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 
@@ -12,7 +11,7 @@ connectDB();
 
 const app = express();
 
-// ✅ CORS CONFIG (Render + Local + Netlify safe)
+// Allowed Origins
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
@@ -21,20 +20,16 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true); // Postman / server requests
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.log("❌ Blocked by CORS:", origin);
-      callback(null, true); // IMPORTANT: Don't crash server
-    }
+    console.log("❌ Blocked by CORS:", origin);
+    return callback(null, true); // prevent crash
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true
 }));
 
-// ✅ Preflight fix
 app.options("*", cors());
 
 // Middlewares
@@ -45,7 +40,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/projects", projectRoutes);
 app.use("/api/categories", categoryRoutes);
 
-// Root test route
+// Test Route
 app.get("/", (req, res) => {
   res.json({
     status: "Active",
@@ -54,7 +49,7 @@ app.get("/", (req, res) => {
   });
 });
 
-// Global Error Handler
+// Error Handler
 app.use((err, req, res, next) => {
   console.error("🔥 SERVER ERROR:", err.stack);
   res.status(500).json({
