@@ -11,7 +11,6 @@ connectDB();
 
 const app = express();
 
-// Allowed Origins
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
@@ -23,43 +22,29 @@ app.use(cors({
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) return callback(null, true);
 
-    console.log("❌ Blocked by CORS:", origin);
+    console.log("Blocked CORS:", origin);
     return callback(null, true);
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true
 }));
 
-app.options("*", cors());
+// ❌ REMOVE app.options("*", cors());
 
-// Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
 app.use("/api/projects", projectRoutes);
 app.use("/api/categories", categoryRoutes);
 
-// Test Route
 app.get("/", (req, res) => {
-  res.json({
-    status: "Active",
-    message: "AmanFTX Backend Running 🚀",
-    uptime: process.uptime()
-  });
+  res.json({ status: "Active", message: "Backend Running 🚀" });
 });
 
-// Error Handler
 app.use((err, req, res, next) => {
-  console.error("🔥 SERVER ERROR:", err.stack);
-  res.status(500).json({
-    success: false,
-    message: "Backend Error",
-    error: err.message
-  });
+  console.error("SERVER ERROR:", err);
+  res.status(500).json({ message: "Server Error", error: err.message });
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server Running on Port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on ${PORT}`));
