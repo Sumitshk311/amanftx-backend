@@ -4,15 +4,16 @@ const categorySchema = new mongoose.Schema({
   name: { 
     type: String, 
     required: true, 
-    unique: true,
+    unique: true, 
     trim: true 
   },
   displayTitle: { 
     type: String, 
     required: true,
-    trim: true
+    trim: true 
   },
 }, { timestamps: true });
 
-const Category = mongoose.model("Category", categorySchema);
+// Pehle agar koi model bana ho toh use update karne ke liye
+const Category = mongoose.models.Category || mongoose.model("Category", categorySchema);
 export default Category;
