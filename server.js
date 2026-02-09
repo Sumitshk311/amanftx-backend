@@ -14,7 +14,8 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
-  "https://aman-ftx.netlify.app"
+  "https://aman-ftx.netlify.app",
+  "https://ftxmedia.netlify.app",
 ];
 
 app.use(cors({
